@@ -57,11 +57,11 @@ public final class InferenceEngine {
                     break; // can't imply the goal, don't proceed
             }
 
-            // [comment]
+            // search a rule to the condition
             RuleProcessing match = canBeImplicated(condition, processing);
 
             if (match == null) {
-                // [comment]
+                // condition can't be implicated by any rule, so request the condition value from the user
                 String value = onRequestUserInput.requestValue(condition);
 
                 if (value.equals(condition.value)) {
@@ -72,7 +72,7 @@ public final class InferenceEngine {
                 }
             } else {
                 while (match != null) {
-                    // recursive call breaking into a sub-problem
+                    // recursive call breaking the condition into a sub-problem
                     backwardChaining(match, processing, workingMemory, onRequestUserInput);
 
                     // condition resolved, lets to the next condition
@@ -84,7 +84,7 @@ public final class InferenceEngine {
             }
         }
 
-        // [comment]
+        // then evaluate the goal
         if (workingMemory.containsAll(goal.rule.conditions)) {
             workingMemory.addAll(goal.rule.implications);
             goal.status = IMPLICATED;
