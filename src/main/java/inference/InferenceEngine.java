@@ -17,10 +17,10 @@ public final class InferenceEngine {
         Set<Sentence> workingMemory = new HashSet<>();
         ExecutionResult result = new ExecutionResult();
 
-        processing.forEach(p -> {
-            if (p.status == PENDING)
-                backwardChaining(p, processing, workingMemory, params.onRequestUserInput);
-        });
+        if (processing.isEmpty()) return result;
+
+        // start with the first rule
+        backwardChaining(processing.get(0), processing, workingMemory, params.onRequestUserInput);
 
         workingMemory.forEach(s -> {
             if (params.goals.contains(s.key))
@@ -70,6 +70,8 @@ public final class InferenceEngine {
                     Sentence actual = new Sentence(condition.key, value);
                     workingMemory.add(actual);
                 }
+                // try to generate new implications
+                forwardChaining(processing, workingMemory);
             } else {
                 while (match != null) {
                     // recursive call breaking the condition into a sub-problem
@@ -105,6 +107,17 @@ public final class InferenceEngine {
         return workingMemory.stream()
             .filter(c -> c.key.equals(sentence.key))
             .findFirst();
+    }
+
+    private void forwardChaining(List<RuleProcessing> processing, Set<Sentence> workingMemory) {
+        for (RuleProcessing p : processing) {
+            if (p.status != PENDING) continue;
+
+            if (workingMemory.containsAll(p.rule.conditions)) {
+                workingMemory.addAll(p.rule.implications);
+                p.status = IMPLICATED;
+            }
+        }
     }
 
 }
