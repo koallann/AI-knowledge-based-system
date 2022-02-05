@@ -1,4 +1,7 @@
-package domain;
+package inference;
+
+import domain.OnRequestUserInput;
+import domain.Rule;
 
 import java.util.ArrayList;
 import java.util.HashSet;

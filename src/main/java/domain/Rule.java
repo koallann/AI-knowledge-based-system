@@ -1,15 +1,21 @@
 package domain;
 
-import java.util.Set;
+import java.util.List;
 
 public final class Rule {
 
-    public final Set<Sentence> conditions;
-    public final Set<Sentence> implications;
+    public enum Status {
+        PENDING, IMPLICATED, NOT_IMPLICATED
+    }
 
-    public Rule(Set<Sentence> conditions, Set<Sentence> implications) {
+    public final List<Sentence> conditions;
+    public final List<Sentence> implications;
+    public Status status;
+
+    public Rule(List<Sentence> conditions, List<Sentence> implications) {
         this.conditions = conditions;
         this.implications = implications;
+        this.status = Status.PENDING;
     }
 
     @Override

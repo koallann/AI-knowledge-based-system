@@ -1,4 +1,6 @@
-package domain;
+package inference;
+
+import domain.Sentence;
 
 import java.util.ArrayList;
 import java.util.List;

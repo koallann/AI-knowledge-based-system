@@ -1,27 +1,29 @@
 package inference;
 
-import domain.*;
+import domain.OnRequestUserInput;
+import domain.Rule;
+import domain.Sentence;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static inference.RuleProcessing.Status.*;
+import static domain.Rule.Status.*;
 
 public final class InferenceEngine {
 
     public ExecutionResult run(ExecutionParams params) {
-        List<RuleProcessing> processing = buildProcessingList(params.rules);
+        List<Rule> rules = params.rules;
         Set<Sentence> workingMemory = new HashSet<>();
         ExecutionResult result = new ExecutionResult();
 
-        if (processing.isEmpty()) return result;
+        if (rules.isEmpty()) return result;
 
         // start with the first rule
-        backwardChaining(processing.get(0), processing, workingMemory, params.onRequestUserInput);
+        backwardChaining(rules.get(0), rules, workingMemory, params.onRequestUserInput);
 
+        // set result
         workingMemory.forEach(s -> {
             if (params.goals.contains(s.key))
                 result.goalMatches.add(s);
@@ -30,15 +32,9 @@ public final class InferenceEngine {
         return result;
     }
 
-    private List<RuleProcessing> buildProcessingList(List<Rule> rules) {
-        return rules.stream()
-            .map(RuleProcessing::new)
-            .collect(Collectors.toList());
-    }
-
     private void backwardChaining(
-        RuleProcessing goal,
-        List<RuleProcessing> processing,
+        Rule goal,
+        List<Rule> rules,
         Set<Sentence> workingMemory,
         OnRequestUserInput onRequestUserInput
     ) {
@@ -46,7 +42,7 @@ public final class InferenceEngine {
         if (goal.status == IMPLICATED || goal.status == NOT_IMPLICATED) return;
 
         // we need to evaluate all the goal conditions
-        for (Sentence condition : goal.rule.conditions) {
+        for (Sentence condition : goal.conditions) {
             // first check if condition is already on working memory
             Optional<Sentence> conditionInWM = findInWorkingMemory(condition, workingMemory);
 
@@ -58,7 +54,7 @@ public final class InferenceEngine {
             }
 
             // search a rule to the condition
-            RuleProcessing match = canBeImplicated(condition, processing);
+            Rule match = canBeImplicated(condition, rules);
 
             if (match == null) {
                 // condition can't be implicated by any rule, so request the condition value from the user
@@ -71,34 +67,37 @@ public final class InferenceEngine {
                     workingMemory.add(actual);
                 }
                 // try to generate new implications
-                forwardChaining(processing, workingMemory);
+                forwardChaining(rules, workingMemory);
+
+                // don't proceed if condition not satisfied
+                if (!value.equals(condition.value)) break;
             } else {
                 while (match != null) {
                     // recursive call breaking the condition into a sub-problem
-                    backwardChaining(match, processing, workingMemory, onRequestUserInput);
+                    backwardChaining(match, rules, workingMemory, onRequestUserInput);
 
                     // condition resolved, lets to the next condition
                     if (match.status == IMPLICATED) break;
 
                     // try with another rule
-                    match = canBeImplicated(condition, processing);
+                    match = canBeImplicated(condition, rules);
                 }
             }
         }
 
         // then evaluate the goal
-        if (workingMemory.containsAll(goal.rule.conditions)) {
-            workingMemory.addAll(goal.rule.implications);
+        if (workingMemory.containsAll(goal.conditions)) {
+            workingMemory.addAll(goal.implications);
             goal.status = IMPLICATED;
         } else {
             goal.status = NOT_IMPLICATED;
         }
     }
 
-    private RuleProcessing canBeImplicated(Sentence sentence, List<RuleProcessing> processing) {
-        for (RuleProcessing p : processing) {
-            if (p.status == PENDING && p.rule.implications.contains(sentence))
-                return p;
+    private Rule canBeImplicated(Sentence sentence, List<Rule> rules) {
+        for (Rule r : rules) {
+            if (r.status == PENDING && r.implications.contains(sentence))
+                return r;
         }
         return null;
     }
@@ -109,13 +108,13 @@ public final class InferenceEngine {
             .findFirst();
     }
 
-    private void forwardChaining(List<RuleProcessing> processing, Set<Sentence> workingMemory) {
-        for (RuleProcessing p : processing) {
-            if (p.status != PENDING) continue;
+    private void forwardChaining(List<Rule> rules, Set<Sentence> workingMemory) {
+        for (Rule r : rules) {
+            if (r.status != PENDING) continue;
 
-            if (workingMemory.containsAll(p.rule.conditions)) {
-                workingMemory.addAll(p.rule.implications);
-                p.status = IMPLICATED;
+            if (workingMemory.containsAll(r.conditions)) {
+                workingMemory.addAll(r.implications);
+                r.status = IMPLICATED;
             }
         }
     }
