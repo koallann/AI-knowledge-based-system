@@ -5,7 +5,7 @@ import java.util.List;
 
 public final class ExecutionResult {
 
-    final List<Sentence> goalMatches;
+    public final List<Sentence> goalMatches;
 
     public ExecutionResult() {
         this.goalMatches = new ArrayList<>();

@@ -7,12 +7,14 @@ import java.util.Set;
 
 public final class ExecutionParams {
 
-    final List<Rule> rules;
-    final Set<String> goals;
+    public final List<Rule> rules;
+    public final Set<String> goals;
+    public final OnRequestUserInput onRequestUserInput;
 
-    public ExecutionParams() {
+    public ExecutionParams(OnRequestUserInput onRequestUserInput) {
         this.rules = new ArrayList<>();
         this.goals = new HashSet<>();
+        this.onRequestUserInput = onRequestUserInput;
     }
 
 }
