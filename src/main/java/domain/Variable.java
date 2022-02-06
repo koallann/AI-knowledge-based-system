@@ -14,7 +14,7 @@ public final class Variable {
 
     @Override
     public String toString() {
-        return String.format("Variable{%s=%s}", key, value);
+        return String.format("Variable { %s=%s }", key, value);
     }
 
     @Override

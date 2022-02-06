@@ -3,6 +3,7 @@ package inference;
 import domain.Variable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public final class ExecutionResult {
@@ -15,13 +16,16 @@ public final class ExecutionResult {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("ExecutionResult{");
+        StringBuilder builder = new StringBuilder("ExecutionResult { ");
 
-        goalMatches.forEach(m -> builder.append(String.format("%s=%s, ", m.key, m.value)));
-        builder.delete(builder.length() - 2, builder.length());
-        builder.append("}");
+        Iterator<Variable> iterator = goalMatches.iterator();
+        while (iterator.hasNext()) {
+            Variable match = iterator.next();
+            builder.append(String.format("%s=%s", match.key, match.value));
+            if (iterator.hasNext()) builder.append(", ");
+        }
 
-        return builder.toString();
+        return builder.append(" }").toString();
     }
 
 }
