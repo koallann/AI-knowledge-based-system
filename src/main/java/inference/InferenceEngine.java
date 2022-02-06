@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static domain.Rule.Status.*;
 
@@ -20,14 +21,21 @@ public final class InferenceEngine {
 
         if (rules.isEmpty()) return result;
 
-        // start with the first rule
-        backwardChaining(rules.get(0), rules, workingMemory, params.onRequestUserVariable);
+        // run chaining for each rule that's not resolved yet
+        for (Rule rule : rules) {
+            if (rule.status == PENDING)
+                backwardChaining(rule, rules, workingMemory, params.onRequestUserVariable);
+        }
 
         // set result
-        workingMemory.forEach(s -> {
-            if (params.goals.contains(s.key))
-                result.goalMatches.add(s);
-        });
+
+        result.allMatches.addAll(workingMemory);
+
+        result.goalMatches.addAll(
+            workingMemory.stream()
+                .filter(v -> params.goals.contains(v.key))
+                .collect(Collectors.toList())
+        );
 
         return result;
     }
