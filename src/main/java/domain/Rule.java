@@ -8,11 +8,11 @@ public final class Rule {
         PENDING, IMPLICATED, NOT_IMPLICATED
     }
 
-    public final List<Sentence> conditions;
-    public final List<Sentence> implications;
+    public final List<Variable> conditions;
+    public final List<Variable> implications;
     public Status status;
 
-    public Rule(List<Sentence> conditions, List<Sentence> implications) {
+    public Rule(List<Variable> conditions, List<Variable> implications) {
         this.conditions = conditions;
         this.implications = implications;
         this.status = Status.PENDING;

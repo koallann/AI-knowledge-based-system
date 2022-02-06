@@ -1,6 +1,6 @@
 package inference;
 
-import domain.OnRequestUserInput;
+import domain.OnRequestUserVariable;
 import domain.Rule;
 
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ public final class ExecutionParams {
 
     public final List<Rule> rules;
     public final Set<String> goals;
-    public final OnRequestUserInput onRequestUserInput;
+    public final OnRequestUserVariable onRequestUserVariable;
 
-    public ExecutionParams(OnRequestUserInput onRequestUserInput) {
+    public ExecutionParams(OnRequestUserVariable onRequestUserVariable) {
         this.rules = new ArrayList<>();
         this.goals = new HashSet<>();
-        this.onRequestUserInput = onRequestUserInput;
+        this.onRequestUserVariable = onRequestUserVariable;
     }
 
 }

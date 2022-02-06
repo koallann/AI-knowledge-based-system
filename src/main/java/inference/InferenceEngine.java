@@ -1,8 +1,8 @@
 package inference;
 
-import domain.OnRequestUserInput;
+import domain.OnRequestUserVariable;
 import domain.Rule;
-import domain.Sentence;
+import domain.Variable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,13 +15,13 @@ public final class InferenceEngine {
 
     public ExecutionResult run(ExecutionParams params) {
         List<Rule> rules = params.rules;
-        Set<Sentence> workingMemory = new HashSet<>();
+        Set<Variable> workingMemory = new HashSet<>();
         ExecutionResult result = new ExecutionResult();
 
         if (rules.isEmpty()) return result;
 
         // start with the first rule
-        backwardChaining(rules.get(0), rules, workingMemory, params.onRequestUserInput);
+        backwardChaining(rules.get(0), rules, workingMemory, params.onRequestUserVariable);
 
         // set result
         workingMemory.forEach(s -> {
@@ -35,16 +35,16 @@ public final class InferenceEngine {
     private void backwardChaining(
         Rule goal,
         List<Rule> rules,
-        Set<Sentence> workingMemory,
-        OnRequestUserInput onRequestUserInput
+        Set<Variable> workingMemory,
+        OnRequestUserVariable onRequestUserVariable
     ) {
         // ignore rule already evaluated
         if (goal.status == IMPLICATED || goal.status == NOT_IMPLICATED) return;
 
         // we need to evaluate all the goal conditions
-        for (Sentence condition : goal.conditions) {
+        for (Variable condition : goal.conditions) {
             // first check if condition is already on working memory
-            Optional<Sentence> conditionInWM = findInWorkingMemory(condition, workingMemory);
+            Optional<Variable> conditionInWM = findInWorkingMemory(condition, workingMemory);
 
             if (conditionInWM.isPresent()) {
                 if (conditionInWM.get().equals(condition))
@@ -58,12 +58,12 @@ public final class InferenceEngine {
 
             if (match == null) {
                 // condition can't be implicated by any rule, so request the condition value from the user
-                String value = onRequestUserInput.requestValue(condition);
+                String value = onRequestUserVariable.requestValue(condition.key);
 
                 if (value.equals(condition.value)) {
                     workingMemory.add(condition);
                 } else {
-                    Sentence actual = new Sentence(condition.key, value);
+                    Variable actual = new Variable(condition.key, value);
                     workingMemory.add(actual);
                 }
                 // try to generate new implications
@@ -76,7 +76,7 @@ public final class InferenceEngine {
 
                 while (match != null) {
                     // recursive call breaking the condition into a sub-problem
-                    backwardChaining(match, rules, workingMemory, onRequestUserInput);
+                    backwardChaining(match, rules, workingMemory, onRequestUserVariable);
 
                     // condition resolved, lets to the next condition
                     if (match.status == IMPLICATED) {
@@ -102,21 +102,21 @@ public final class InferenceEngine {
         }
     }
 
-    private Rule canBeImplicated(Sentence sentence, List<Rule> rules) {
+    private Rule canBeImplicated(Variable variable, List<Rule> rules) {
         for (Rule r : rules) {
-            if (r.status == PENDING && r.implications.contains(sentence))
+            if (r.status == PENDING && r.implications.contains(variable))
                 return r;
         }
         return null;
     }
 
-    private Optional<Sentence> findInWorkingMemory(Sentence sentence, Set<Sentence> workingMemory) {
+    private Optional<Variable> findInWorkingMemory(Variable variable, Set<Variable> workingMemory) {
         return workingMemory.stream()
-            .filter(c -> c.key.equals(sentence.key))
+            .filter(c -> c.key.equals(variable.key))
             .findFirst();
     }
 
-    private void forwardChaining(List<Rule> rules, Set<Sentence> workingMemory) {
+    private void forwardChaining(List<Rule> rules, Set<Variable> workingMemory) {
         for (Rule r : rules) {
             if (r.status != PENDING) continue;
 
