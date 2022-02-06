@@ -27,6 +27,7 @@ public class Main {
     private static void startMainMenu() {
         int option;
         do {
+            clear();
             println("===== Knowledge-Based System =====\n");
             println("1 - Run");
             println("2 - Manage Rules");
@@ -49,11 +50,11 @@ public class Main {
                     break;
                 case 0:
                     println("Exiting...");
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 default:
                     println("Invalid option!");
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
             }
         } while (option != 0);
@@ -72,14 +73,14 @@ public class Main {
         InferenceEngine engine = new InferenceEngine();
         ExecutionResult result = engine.run(params);
 
-        print("\n");
         println(result.toString());
-        holdOutput(scanner);
+        hold(scanner);
     }
 
     private static void startRulesMenu() {
         int option;
         do {
+            clear();
             println("===== Rules =====\n");
             println("1 - List");
             println("2 - Add");
@@ -97,7 +98,7 @@ public class Main {
                     if (rules.isEmpty()) println("EMPTY");
                     for (int i = 0; i < rules.size(); i++) printf("%d - %s\n", i, rules.get(i));
 
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 2:
                     println("Format: (key1=value1 and key2=value2 and ...)\n");
@@ -111,19 +112,19 @@ public class Main {
                     Rule rule = new Rule(conditions, implications);
                     rulesRepository.add(rule);
 
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 3:
                     print("Type the rule index: ");
                     int index = Integer.parseInt(scanner.nextLine());
                     rulesRepository.remove(index);
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 0:
                     break;
                 default:
                     println("Invalid option!");
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
             }
         } while (option != 0);
@@ -144,6 +145,7 @@ public class Main {
     private static void startGoalsMenu() {
         int option;
         do {
+            clear();
             println("===== Goals =====\n");
             println("1 - List");
             println("2 - Add");
@@ -161,25 +163,25 @@ public class Main {
                     if (goals.isEmpty()) println("EMPTY");
                     for (int i = 0; i < goals.size(); i++) printf("%d - %s\n", i, goals.get(i));
 
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 2:
                     print("Type the goal key: ");
                     String goal = scanner.nextLine().trim();
                     goalsRepository.add(goal);
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 3:
                     print("Type the goal index: ");
                     int index = Integer.parseInt(scanner.nextLine());
                     goalsRepository.remove(index);
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
                 case 0:
                     break;
                 default:
                     println("Invalid option!");
-                    holdOutput(scanner);
+                    hold(scanner);
                     break;
             }
         } while (option != 0);

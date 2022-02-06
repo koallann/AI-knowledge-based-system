@@ -4,6 +4,11 @@ import java.util.Scanner;
 
 public final class OutputUtils {
 
+    public static void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
     public static void print(String s) {
         System.out.print(s);
     }
@@ -16,7 +21,7 @@ public final class OutputUtils {
         System.out.printf(s, args);
     }
 
-    public static void holdOutput(Scanner scanner) {
+    public static void hold(Scanner scanner) {
         print("\nPress enter to continue...");
         scanner.nextLine();
         print("\n");

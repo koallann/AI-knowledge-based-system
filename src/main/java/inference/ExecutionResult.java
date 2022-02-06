@@ -18,7 +18,7 @@ public final class ExecutionResult {
     @Override
     public String toString() {
         return String.format(
-            "ExecutionResult {\nAll Matches:  %s\nGoal Matches: %s\n}",
+            "ExecutionResult {\n    All Matches:  %s\n    Goal Matches: %s\n}",
             Variable.collectionString(allMatches, ", "),
             Variable.collectionString(goalMatches, ", ")
         );
