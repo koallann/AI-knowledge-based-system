@@ -72,16 +72,24 @@ public final class InferenceEngine {
                 // don't proceed if condition not satisfied
                 if (!value.equals(condition.value)) break;
             } else {
+                boolean matchResolved = false;
+
                 while (match != null) {
                     // recursive call breaking the condition into a sub-problem
                     backwardChaining(match, rules, workingMemory, onRequestUserInput);
 
                     // condition resolved, lets to the next condition
-                    if (match.status == IMPLICATED) break;
+                    if (match.status == IMPLICATED) {
+                        matchResolved = true;
+                        break;
+                    }
 
                     // try with another rule
                     match = canBeImplicated(condition, rules);
                 }
+
+                // don't proceed if condition not satisfied
+                if (!matchResolved) break;
             }
         }
 
