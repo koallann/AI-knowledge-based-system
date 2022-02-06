@@ -1,6 +1,5 @@
 package domain;
 
-import java.util.Iterator;
 import java.util.List;
 
 public final class Rule {
@@ -21,25 +20,11 @@ public final class Rule {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("Rule { IF");
-
-        Iterator<Variable> iterator1 = conditions.iterator();
-        while (iterator1.hasNext()) {
-            Variable c = iterator1.next();
-            builder.append(String.format(" %s=%s", c.key, c.value));
-            if (iterator1.hasNext()) builder.append(" and");
-        }
-
-        builder.append(" THEN");
-
-        Iterator<Variable> iterator2 = implications.iterator();
-        while (iterator2.hasNext()) {
-            Variable i = iterator2.next();
-            builder.append(String.format(" %s=%s", i.key, i.value));
-            if (iterator2.hasNext()) builder.append(" and");
-        }
-
-        return builder.append(" }").toString();
+        return String.format(
+            "Rule { IF %s THEN %s }",
+            Variable.collectionString(conditions, " and "),
+            Variable.collectionString(implications, " and ")
+        );
     }
 
 }
