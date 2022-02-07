@@ -73,7 +73,7 @@ public class Main {
         InferenceEngine engine = new InferenceEngine();
         ExecutionResult result = engine.run(params);
 
-        println(result.toString());
+        println("\n" + result);
         hold(scanner);
     }
 
